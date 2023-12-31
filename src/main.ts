@@ -38,7 +38,15 @@ const file_name: string = pipe(TABLE_NAME, singularize);
 const interface_name: string = pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
 
 let content = `export interface ${interface_name} {
-${table_schema.map(item => `\t${item.column_name}: ${data_type_dictionary[item.data_type as string]};`).join("\n")}
+${ 
+    table_schema
+        .map(item => {
+            const column_name: string = item.column_name as string;
+            const type: string = data_type_dictionary[item.data_type as string];
+            return `\t${column_name}: ${type};`;
+    })
+    .join("\n")
+}
 }`;
 
 writeFileSync(`./bindings/${file_name}.ts`, content);
