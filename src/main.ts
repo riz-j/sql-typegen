@@ -52,10 +52,4 @@ writeFileSync(`./bindings/${pipe(TABLE_NAME, singularize)}.ts`, content);
 
 console.log(content);
 
-// console.log(`export interface ${interface_name} {`)
-// table_schema.map(item => {
-//     console.log(`   ${item.column_name}: ${data_type_dictionary[item.data_type as string]};`)
-// });
-// console.log(`}`)
-
 process.exit(0);
