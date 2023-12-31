@@ -7,50 +7,35 @@ import { ColumnSchema, PostgresDbOptions } from "@/models/db";
 import { parse_db_connection_url } from "@/functions/db";
 import { writeFileSync } from "fs";
 
+// Constants for command-line arguments
 const CONNECTION_STRING: string = getArgvValue(process.argv, "--database");
 const TABLE_NAME: string = getArgvValue(process.argv, "--table");
 
-const dbOptions: PostgresDbOptions = pipe(
-    CONNECTION_STRING,
-    parse_db_connection_url,
+const dbOptions: PostgresDbOptions = pipe(CONNECTION_STRING, parse_db_connection_url,
     E.fold(
-        (error: Error) => { console.log(error); process.exit(1); },
+        (error: Error) => { console.log("ERROR GENERATING DB_OPTIONS", error); process.exit(1); },
         (dbOptions: PostgresDbOptions) => dbOptions
     )
 );
 
 const sql = postgres(dbOptions);
 
-const table_schema = await sql`
-    SELECT
-        column_name,
-        data_type,
-        is_nullable    
-    FROM
-        information_schema.columns
-    WHERE
-        table_name = ${TABLE_NAME}
-    ORDER BY
-        ordinal_position;
-` as Array<ColumnSchema>
+const table_schema: ColumnSchema[] = await sql`
+    SELECT column_name, data_type, is_nullable    
+    FROM information_schema.columns
+    WHERE table_name = ${TABLE_NAME}
+    ORDER BY ordinal_position;
+`;
 
-const file_name: string = pipe(TABLE_NAME, singularize);
+const file_name: string = (pipe(TABLE_NAME, singularize) + ".ts");
 const interface_name: string = pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
 
-let content = `export interface ${interface_name} {
-${ 
-    table_schema
-        .map(item => {
-            const column_name: string = item.column_name as string;
-            const type: string = data_type_dictionary[item.data_type as string];
-            return `\t${column_name}: ${type};`;
-    })
-    .join("\n")
-}
+const content = `export interface ${interface_name} {
+${table_schema.map(({ column_name, data_type }) => 
+    `\t${column_name}: ${data_type_dictionary[data_type as string]};`
+).join("\n")}
 }`;
 
-writeFileSync(`./bindings/${file_name}.ts`, content);
-
-console.log(content);
-
+writeFileSync(`./bindings/${file_name}`, content);
+console.log(`\n\n  ${file_name} generated successfully.\n`);
 process.exit(0);
