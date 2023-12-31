@@ -34,21 +34,14 @@ const table_schema = await sql`
         ordinal_position;
 ` as Array<ColumnSchema>
 
-const interface_name: string = pipe(
-    TABLE_NAME,
-    singularize,
-    capitalizeFirstLetter
-);
+const file_name: string = pipe(TABLE_NAME, singularize);
+const interface_name: string = pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
 
+let content = `export interface ${interface_name} {
+${table_schema.map(item => `\t${item.column_name}: ${data_type_dictionary[item.data_type as string]};`).join("\n")}
+}`;
 
-let content = "";
-content += `export interface ${interface_name} {`;
-table_schema.map(item => {
-    content += `\n\t${item.column_name}: ${data_type_dictionary[item.data_type as string]};`
-});
-content += "\n}"
-
-writeFileSync(`./bindings/${pipe(TABLE_NAME, singularize)}.ts`, content);
+writeFileSync(`./bindings/${file_name}.ts`, content);
 
 console.log(content);
 
