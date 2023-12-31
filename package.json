@@ -1,7 +1,13 @@
 {
   "name": "sql-typegen",
-  "module": "index.ts",
+  "version": "0.0.4",
+  "description": "",
+  "main": "./src/main.ts",
   "type": "module",
+  "bin": "./dist/index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
     "bun-types": "latest"
   },

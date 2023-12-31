@@ -5,7 +5,7 @@ import { data_type_dictionary } from "@/functions/data-type-dictionary";
 import { capitalizeFirstLetter, getArgvValue, singularize } from "@/functions/common";
 import { ColumnSchema, PostgresDbOptions } from "@/models/db";
 import { parse_db_connection_url } from "@/functions/db";
-import { writeFile } from "fs";
+import { writeFileSync } from "fs";
 
 const CONNECTION_STRING: string = getArgvValue(process.argv, "--database");
 const TABLE_NAME: string = getArgvValue(process.argv, "--table");
@@ -48,7 +48,7 @@ table_schema.map(item => {
 });
 content += "\n}"
 
-writeFile(`./bindings/${pipe(TABLE_NAME, singularize)}.ts`, content, (err) => (err));
+writeFileSync(`./bindings/${pipe(TABLE_NAME, singularize)}.ts`, content);
 
 console.log(content);
 

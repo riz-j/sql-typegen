@@ -3741,6 +3741,7 @@ var parse_db_connection_url = (db_connection_url) => {
 };
 
 // src/main.ts
+import {writeFileSync} from "fs";
 var CONNECTION_STRING = getArgvValue(process.argv, "--database");
 var TABLE_NAME = getArgvValue(process.argv, "--table");
 var dbOptions = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E2.fold((error) => {
@@ -3761,9 +3762,12 @@ var table_schema = await sql`
         ordinal_position;
 `;
 var interface_name = function2.pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
-console.log(`export interface ${interface_name} {`);
+var content = "";
+content += `export interface ${interface_name} {`;
 table_schema.map((item) => {
-  console.log(`   ${item.column_name}: ${data_type_dictionary[item.data_type]};`);
+  content += `\n\t${item.column_name}: ${data_type_dictionary[item.data_type]};`;
 });
-console.log(`}`);
+content += "\n}";
+writeFileSync(`./bindings/${function2.pipe(TABLE_NAME, singularize)}.ts`, content);
+console.log(content);
 process.exit(0);
