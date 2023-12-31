@@ -66,7 +66,7 @@ const table_schema = await sql`
         ordinal_position;
 ` as Array<ColumnSchema>
 
-const interface_name = pipe(
+const interface_name: string = pipe(
     TABLE_NAME,
     singularize,
     capitalizeFirstLetter
