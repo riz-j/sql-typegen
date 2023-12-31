@@ -5,6 +5,7 @@ import { data_type_dictionary } from "@/functions/data-type-dictionary";
 import { capitalizeFirstLetter, getArgvValue, singularize } from "@/functions/common";
 import { ColumnSchema, PostgresDbOptions } from "@/models/db";
 import { parse_db_connection_url } from "@/functions/db";
+import { writeFile } from "fs";
 
 const CONNECTION_STRING: string = getArgvValue(process.argv, "--database");
 const TABLE_NAME: string = getArgvValue(process.argv, "--table");
@@ -39,10 +40,22 @@ const interface_name: string = pipe(
     capitalizeFirstLetter
 );
 
-console.log(`interface ${interface_name} {`)
+
+let content = "";
+content += `export interface ${interface_name} {`;
 table_schema.map(item => {
-    console.log(`   ${item.column_name}: ${data_type_dictionary[item.data_type as string]};`)
+    content += `\n\t${item.column_name}: ${data_type_dictionary[item.data_type as string]};`
 });
-console.log(`}`)
+content += "\n}"
+
+writeFile(`./bindings/${pipe(TABLE_NAME, singularize)}.ts`, content, (err) => (err));
+
+console.log(content);
+
+// console.log(`export interface ${interface_name} {`)
+// table_schema.map(item => {
+//     console.log(`   ${item.column_name}: ${data_type_dictionary[item.data_type as string]};`)
+// });
+// console.log(`}`)
 
 process.exit(0);

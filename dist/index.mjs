@@ -3761,7 +3761,7 @@ var table_schema = await sql`
         ordinal_position;
 `;
 var interface_name = function2.pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
-console.log(`interface ${interface_name} {`);
+console.log(`export interface ${interface_name} {`);
 table_schema.map((item) => {
   console.log(`   ${item.column_name}: ${data_type_dictionary[item.data_type]};`);
 });

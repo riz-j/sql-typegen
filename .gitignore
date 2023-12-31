@@ -170,3 +170,7 @@ out
 # Old folder
 
 .old
+
+# Bindings
+
+bindings
