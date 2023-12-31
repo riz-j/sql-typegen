@@ -3745,9 +3745,6 @@ var dbOptions = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E.fol
   process.exit(1);
 }, (dbOptions2) => dbOptions2));
 var sql = src_default(dbOptions);
-var result2 = await sql`
-    SELECT * FROM countries;
-`;
 var table_schema = await sql`
     SELECT
         column_name,

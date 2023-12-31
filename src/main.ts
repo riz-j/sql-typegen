@@ -1,21 +1,14 @@
 import postgres from "postgres";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
-import { data_type_dictionary } from "./common/data-type-dictionary";
-import { capitalizeFirstLetter, getArgvValue, singularize } from "./common/common";
+import { data_type_dictionary } from "@/common/data-type-dictionary";
+import { capitalizeFirstLetter, getArgvValue, singularize } from "@/common/common";
+import { ColumnSchema, PostgresDbOptions } from "@/models/db";
 
 const CONNECTION_STRING: string = getArgvValue(process.argv, "--database");
 const TABLE_NAME: string = getArgvValue(process.argv, "--table");
 
-interface DbOptions {
-    host: string,
-    port: number,
-    database: string,
-    username: string,
-    password: string
-}
-
-const parse_db_connection_url = (db_connection_url: string): E.Either<Error, DbOptions>  => {
+const parse_db_connection_url = (db_connection_url: string): E.Either<Error, PostgresDbOptions>  => {
     try {
         const url = new URL(db_connection_url);
 
@@ -32,26 +25,16 @@ const parse_db_connection_url = (db_connection_url: string): E.Either<Error, DbO
     }
 }
 
-const dbOptions: DbOptions = pipe(
+const dbOptions: PostgresDbOptions = pipe(
     CONNECTION_STRING,
     parse_db_connection_url,
     E.fold(
         (error: Error) => { console.log(error); process.exit(1); },
-        (dbOptions: DbOptions) => dbOptions
+        (dbOptions: PostgresDbOptions) => dbOptions
     )
 );
 
 const sql = postgres(dbOptions);
-
-const result = await sql`
-    SELECT * FROM countries;
-`;
-
-interface ColumnSchema {
-    column_name: String,
-    data_type: String,
-    is_nullable: "NO" | "YES",
-}
 
 const table_schema = await sql`
     SELECT
