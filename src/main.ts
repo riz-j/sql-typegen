@@ -70,7 +70,7 @@ const table_schema = await sql`
         ordinal_position;
 ` as Array<ColumnSchema>
 
-const datatypeitem = table_schema[3].data_type as string; 
+// const datatypeitem = table_schema[3].data_type as string; 
 // console.log(table_schema);
 
 

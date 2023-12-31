@@ -3760,7 +3760,6 @@ var table_schema = await sql`
     ORDER BY
         ordinal_position;
 `;
-var datatypeitem = table_schema[3].data_type;
 var interface_name = function2.pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
 console.log(`interface ${interface_name} {`);
 table_schema.map((item) => {
