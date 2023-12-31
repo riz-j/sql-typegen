@@ -3747,29 +3747,21 @@ import {writeFileSync} from "fs";
 var CONNECTION_STRING = getArgvValue(process.argv, "--database");
 var TABLE_NAME = getArgvValue(process.argv, "--table");
 var dbOptions = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E2.fold((error) => {
-  console.log(error);
+  console.log("ERROR GENERATING DB_OPTIONS", error);
   process.exit(1);
 }, (dbOptions2) => dbOptions2));
 var sql = src_default(dbOptions);
 var table_schema = await sql`
-    SELECT
-        column_name,
-        data_type,
-        is_nullable    
-    FROM
-        information_schema.columns
-    WHERE
-        table_name = ${TABLE_NAME}
-    ORDER BY
-        ordinal_position;
+    SELECT column_name, data_type, is_nullable    
+    FROM information_schema.columns
+    WHERE table_name = ${TABLE_NAME}
+    ORDER BY ordinal_position;
 `;
+var file_name = function2.pipe(TABLE_NAME, singularize) + ".ts";
 var interface_name = function2.pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
-var content = "";
-content += `export interface ${interface_name} {`;
-table_schema.map((item) => {
-  content += `\n\t${item.column_name}: ${data_type_dictionary[item.data_type]};`;
-});
-content += "\n}";
-writeFileSync(`./bindings/${function2.pipe(TABLE_NAME, singularize)}.ts`, content);
-console.log(content);
+var content = `export interface ${interface_name} {
+${table_schema.map(({ column_name, data_type }) => `\t${column_name}: ${data_type_dictionary[data_type]};`).join("\n")}
+}`;
+writeFileSync(`./bindings/${file_name}`, content);
+console.log(`\n\n  ${file_name} generated successfully.\n`);
 process.exit(0);
