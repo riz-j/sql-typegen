@@ -11,12 +11,10 @@ import { writeFileSync } from "fs";
 const CONNECTION_STRING: string = getArgvValue(process.argv, "--database");
 const TABLE_NAME: string = getArgvValue(process.argv, "--table");
 
-const dbOptions: PostgresDbOptions = pipe(CONNECTION_STRING, parse_db_connection_url,
-    E.fold(
-        (error: Error) => { console.log("ERROR GENERATING DB_OPTIONS", error); process.exit(1); },
-        (dbOptions: PostgresDbOptions) => dbOptions
-    )
-);
+const dbOptions: PostgresDbOptions = pipe(CONNECTION_STRING, parse_db_connection_url, E.fold(
+    (error: Error) => { console.log("ERROR GENERATING DB_OPTIONS", error); process.exit(1); },
+    (dbOptions: PostgresDbOptions) => dbOptions
+));
 
 const sql = postgres(dbOptions);
 
