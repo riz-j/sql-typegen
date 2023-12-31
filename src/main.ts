@@ -4,13 +4,9 @@ import { pipe } from "fp-ts/lib/function";
 import { data_type_dictionary } from "./common/data-type-dictionary";
 import { capitalizeFirstLetter, getArgvValue, singularize } from "./common/common";
 
-// console.log(process.argv);S
-
-// const CONNECTION_STRING: string = "postgresql://admin:newpassword@localhost:5433/postgres";
 const CONNECTION_STRING: string = getArgvValue(process.argv, "--database");
 const TABLE_NAME: string = getArgvValue(process.argv, "--table");
 
-//  postgresql://admin:newpassword@localhost:5433/postgres
 interface DbOptions {
     host: string,
     port: number,
@@ -70,15 +66,6 @@ const table_schema = await sql`
         ordinal_position;
 ` as Array<ColumnSchema>
 
-// const datatypeitem = table_schema[3].data_type as string; 
-// console.log(table_schema);
-
-
-// const singularize = (word: string): string => {
-//     return singular(word)
-// }
-
-
 const interface_name = pipe(
     TABLE_NAME,
     singularize,
@@ -90,6 +77,5 @@ table_schema.map(item => {
     console.log(`   ${item.column_name}: ${data_type_dictionary[item.data_type as string]};`)
 });
 console.log(`}`)
-process.exit(0);
 
-// console.log(table_schema);
+process.exit(0);
