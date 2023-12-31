@@ -3658,10 +3658,10 @@ Object.assign(Postgres, {
 var src_default = Postgres;
 
 // src/main.ts
-var E = __toESM(require_Either(), 1);
+var E2 = __toESM(require_Either(), 1);
 var function2 = __toESM(require_function(), 1);
 
-// src/common/data-type-dictionary.ts
+// src/functions/data-type-dictionary.ts
 var data_type_dictionary = {
   bigint: "bigint",
   bigserial: "bigint",
@@ -3706,7 +3706,7 @@ var data_type_dictionary = {
   xml: "string"
 };
 
-// src/common/common.ts
+// src/functions/common.ts
 var getArgvValue = (argv, tag) => argv[argv.indexOf(tag) + 1];
 var capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -3724,9 +3724,8 @@ var singularize = (word) => {
   return word.replace(new RegExp(`(${Object.keys(endings).join("|")})\$`), (r) => endings[r]);
 };
 
-// src/main.ts
-var CONNECTION_STRING = getArgvValue(process.argv, "--database");
-var TABLE_NAME = getArgvValue(process.argv, "--table");
+// src/functions/db.ts
+var E = __toESM(require_Either(), 1);
 var parse_db_connection_url = (db_connection_url) => {
   try {
     const url = new URL(db_connection_url);
@@ -3740,7 +3739,11 @@ var parse_db_connection_url = (db_connection_url) => {
     return E.left(new Error(JSON.stringify(error)));
   }
 };
-var dbOptions = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E.fold((error) => {
+
+// src/main.ts
+var CONNECTION_STRING = getArgvValue(process.argv, "--database");
+var TABLE_NAME = getArgvValue(process.argv, "--table");
+var dbOptions = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E2.fold((error) => {
   console.log(error);
   process.exit(1);
 }, (dbOptions2) => dbOptions2));
