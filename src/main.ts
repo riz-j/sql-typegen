@@ -3,33 +3,27 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import { data_type_map } from "@/maps/data-type-map";
 import { capitalizeFirstLetter, getArgvValue, singularize } from "@/functions/common";
-import { ColumnSchema, PostgresDbOptions } from "@/models/db";
+import { PgColumnSchema, PgDbOptions } from "@/models/db";
 import { parse_db_connection_url } from "@/functions/db";
 import { writeFileSync } from "fs";
 import { generate_interface_line, wrap_interface } from "@/functions/interface";
+import { get_postgres_schema } from "./functions/schema";
 
 // Constants for command-line arguments
 const CONNECTION_STRING: string = getArgvValue(process.argv, "--database");
 const TABLE_NAME: string = getArgvValue(process.argv, "--table");
 
-const db_options: PostgresDbOptions = pipe(CONNECTION_STRING, parse_db_connection_url, E.fold(
+const db_options: PgDbOptions = pipe(CONNECTION_STRING, parse_db_connection_url, E.fold(
     (error: Error) => { console.log("ERROR GENERATING DB_OPTIONS", error); process.exit(1); },
-    (db_options: PostgresDbOptions) => db_options
+    (result: PgDbOptions) => result
 ));
 
-const sql = postgres(db_options);
+const PG_POOL = postgres(db_options);
 
-const table_schema: ColumnSchema[] = await sql`
-    SELECT column_name, data_type, is_nullable    
-    FROM information_schema.columns
-    WHERE table_name = ${TABLE_NAME}
-    ORDER BY ordinal_position;
-`;
-
-if (!table_schema.length) {
-    console.log(`\n\n  ERROR: Table with name '${TABLE_NAME}' is not found\n`);
-    process.exit(1);
-}
+const table_schema: PgColumnSchema[] = pipe(await get_postgres_schema(PG_POOL, TABLE_NAME), E.fold(
+    (error: Error) => { console.log("ERROR GENERATING SCHEMA", error.message); process.exit(1); },
+    (result: PgColumnSchema[]) => result
+));
 
 const file_name: string = (pipe(TABLE_NAME, singularize) + ".ts");
 const interface_name: string = pipe(TABLE_NAME, singularize, capitalizeFirstLetter);

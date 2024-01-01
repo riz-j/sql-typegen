@@ -3660,7 +3660,7 @@ Object.assign(Postgres, {
 var src_default = Postgres;
 
 // src/main.ts
-var E2 = __toESM(require_Either(), 1);
+var E3 = __toESM(require_Either(), 1);
 var function2 = __toESM(require_function(), 1);
 
 // src/maps/data-type-map.ts
@@ -3753,24 +3753,37 @@ var wrap_interface = (interface_name, content_child) => {
   return `export interface ${interface_name} {\n${content_child}\n}`;
 };
 
+// src/functions/schema.ts
+var E2 = __toESM(require_Either(), 1);
+var get_postgres_schema = async (pg_pool, table_name) => {
+  try {
+    const table_schema = await pg_pool`
+            SELECT column_name, data_type, is_nullable    
+            FROM information_schema.columns
+            WHERE table_name = ${table_name}
+            ORDER BY ordinal_position;
+        `;
+    if (!table_schema.length) {
+      return E2.left(new Error(`\n\n  ERROR: Table with name '${table_name}' is not found\n`));
+    }
+    return E2.right(table_schema);
+  } catch (error) {
+    return E2.left(new Error(JSON.stringify(error)));
+  }
+};
+
 // src/main.ts
 var CONNECTION_STRING = getArgvValue(process.argv, "--database");
 var TABLE_NAME = getArgvValue(process.argv, "--table");
-var db_options = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E2.fold((error) => {
+var db_options = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E3.fold((error) => {
   console.log("ERROR GENERATING DB_OPTIONS", error);
   process.exit(1);
-}, (db_options2) => db_options2));
-var sql = src_default(db_options);
-var table_schema = await sql`
-    SELECT column_name, data_type, is_nullable    
-    FROM information_schema.columns
-    WHERE table_name = ${TABLE_NAME}
-    ORDER BY ordinal_position;
-`;
-if (!table_schema.length) {
-  console.log(`\n\n  ERROR: Table with name '${TABLE_NAME}' is not found\n`);
+}, (result2) => result2));
+var PG_POOL = src_default(db_options);
+var table_schema = function2.pipe(await get_postgres_schema(PG_POOL, TABLE_NAME), E3.fold((error) => {
+  console.log("ERROR GENERATING SCHEMA", error.message);
   process.exit(1);
-}
+}, (result2) => result2));
 var file_name = function2.pipe(TABLE_NAME, singularize) + ".ts";
 var interface_name = function2.pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
 var interface_lines = "\t" + table_schema.map(({ column_name, data_type, is_nullable }) => generate_interface_line(column_name, data_type_map[data_type], is_nullable === "YES")).join("\n\t");

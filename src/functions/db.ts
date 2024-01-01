@@ -1,7 +1,7 @@
-import { PostgresDbOptions } from "@/models/db";
+import { PgDbOptions } from "@/models/db";
 import * as E from "fp-ts/Either";
 
-export const parse_db_connection_url = (db_connection_url: string): E.Either<Error, PostgresDbOptions>  => {
+export const parse_db_connection_url = (db_connection_url: string): E.Either<Error, PgDbOptions>  => {
     try {
         const url = new URL(db_connection_url);
 

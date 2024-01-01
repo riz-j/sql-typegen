@@ -1,4 +1,4 @@
-export interface PostgresDbOptions {
+export interface PgDbOptions {
     host: string,
     port: number,
     database: string,
@@ -6,7 +6,7 @@ export interface PostgresDbOptions {
     password: string
 }
 
-export interface ColumnSchema {
+export interface PgColumnSchema {
     column_name: String,
     data_type: String,
     is_nullable: "NO" | "YES",
