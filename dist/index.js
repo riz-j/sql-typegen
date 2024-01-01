@@ -3767,10 +3767,14 @@ var table_schema = await sql`
     WHERE table_name = ${TABLE_NAME}
     ORDER BY ordinal_position;
 `;
+if (table_schema.length < 1) {
+  console.log(`\n\n  ERROR: Table with name '${TABLE_NAME}' is not found\n`);
+  process.exit(1);
+}
 var file_name = function2.pipe(TABLE_NAME, singularize) + ".ts";
 var interface_name = function2.pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
 var interface_lines = "\t" + table_schema.map(({ column_name, data_type, is_nullable }) => generate_interface_line(column_name, data_type_dictionary[data_type], is_nullable === "YES")).join("\n\t");
 var result2 = wrap_interface(interface_name, interface_lines);
 writeFileSync(`./${file_name}`, result2);
-console.log(`\n\n  ${file_name} generated successfully.\n`);
+console.log(`\n\n  SUCCESS: ${file_name} has been generated\n`);
 process.exit(0);
