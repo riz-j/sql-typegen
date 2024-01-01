@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getProtoOf = Object.getPrototypeOf;
@@ -3742,6 +3744,16 @@ var parse_db_connection_url = (db_connection_url) => {
 
 // src/main.ts
 import {writeFileSync} from "fs";
+
+// src/functions/interface.ts
+var generate_interface_line = (property_name, property_type, is_nullable) => {
+  return `${property_name}: ${property_type}${is_nullable ? " | null" : ""};`;
+};
+var wrap_interface = (interface_name, content_child) => {
+  return `export interface ${interface_name} {\n${content_child}\n}`;
+};
+
+// src/main.ts
 var CONNECTION_STRING = getArgvValue(process.argv, "--database");
 var TABLE_NAME = getArgvValue(process.argv, "--table");
 var db_options = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E2.fold((error) => {
@@ -3757,9 +3769,8 @@ var table_schema = await sql`
 `;
 var file_name = function2.pipe(TABLE_NAME, singularize) + ".ts";
 var interface_name = function2.pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
-var content = `export interface ${interface_name} {
-${table_schema.map(({ column_name, data_type, is_nullable }) => `\t${column_name}: ${data_type_dictionary[data_type]}${is_nullable === "YES" ? " | null" : ""};`).join("\n")}
-}`;
-writeFileSync(`./bindings/${file_name}`, content);
+var interface_lines = "\t" + table_schema.map(({ column_name, data_type, is_nullable }) => generate_interface_line(column_name, data_type_dictionary[data_type], is_nullable === "YES")).join("\n\t");
+var result2 = wrap_interface(interface_name, interface_lines);
+writeFileSync(`./bindings/${file_name}`, result2);
 console.log(`\n\n  ${file_name} generated successfully.\n`);
 process.exit(0);
