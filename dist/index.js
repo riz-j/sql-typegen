@@ -3709,8 +3709,8 @@ var data_type_map = {
 };
 
 // src/functions/common.ts
-var getArgvValue = (argv, tag) => argv[argv.indexOf(tag) + 1];
-var capitalizeFirstLetter = (string) => {
+var get_argv_value = (argv, tag) => argv[argv.indexOf(tag) + 1];
+var capitalize_first_letter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 var singularize = (word) => {
@@ -3773,8 +3773,8 @@ var get_postgres_schema = async (pg_pool, table_name) => {
 };
 
 // src/main.ts
-var CONNECTION_STRING = getArgvValue(process.argv, "--database");
-var TABLE_NAME = getArgvValue(process.argv, "--table");
+var CONNECTION_STRING = get_argv_value(process.argv, "--database");
+var TABLE_NAME = get_argv_value(process.argv, "--table");
 var db_options = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E3.fold((error) => {
   console.log("ERROR GENERATING DB_OPTIONS", error);
   process.exit(1);
@@ -3785,7 +3785,7 @@ var table_schema = function2.pipe(await get_postgres_schema(PG_POOL, TABLE_NAME)
   process.exit(1);
 }, (result2) => result2));
 var file_name = function2.pipe(TABLE_NAME, singularize) + ".ts";
-var interface_name = function2.pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
+var interface_name = function2.pipe(TABLE_NAME, singularize, capitalize_first_letter);
 var interface_lines = "\t" + table_schema.map(({ column_name, data_type, is_nullable }) => generate_interface_line(column_name, data_type_map[data_type], is_nullable === "YES")).join("\n\t");
 var result2 = wrap_interface(interface_name, interface_lines);
 writeFileSync(`./${file_name}`, result2);

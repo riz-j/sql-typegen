@@ -3,10 +3,10 @@
  * @param argv - Array of command-line arguments.
  * @param tag - The specific tag to find in the argv array.
  * @returns - The value immediately following the tag or undefined if the tag is not found.
- * @example getArgvValue(process.argv, "--database");
- * @example getArgvValue(process.argv, "--table");
+ * @example get_argv_value(process.argv, "--database");
+ * @example get_argv_value(process.argv, "--table");
  */
-export const getArgvValue = (argv: string[], tag: string): string => argv[argv.indexOf(tag) + 1];
+export const get_argv_value = (argv: string[], tag: string): string => argv[argv.indexOf(tag) + 1];
 
 
 /**
@@ -14,7 +14,7 @@ export const getArgvValue = (argv: string[], tag: string): string => argv[argv.i
  * @param string - The string to capitalize.
  * @returns - The input string with the first letter capitalized.
  */
-export const capitalizeFirstLetter = (string: string): string => {
+export const capitalize_first_letter = (string: string): string => {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
