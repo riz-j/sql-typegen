@@ -6,6 +6,7 @@ import { capitalizeFirstLetter, getArgvValue, singularize } from "@/functions/co
 import { ColumnSchema, PostgresDbOptions } from "@/models/db";
 import { parse_db_connection_url } from "@/functions/db";
 import { writeFileSync } from "fs";
+import { generate_interface_line, wrap_interface } from "@/functions/interface";
 
 // Constants for command-line arguments
 const CONNECTION_STRING: string = getArgvValue(process.argv, "--database");
@@ -27,13 +28,16 @@ const table_schema: ColumnSchema[] = await sql`
 
 const file_name: string = (pipe(TABLE_NAME, singularize) + ".ts");
 const interface_name: string = pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
+const interface_lines: string = "\t" + table_schema.map(({column_name, data_type, is_nullable}) => 
+    generate_interface_line(
+        column_name as string, 
+        data_type_dictionary[data_type as string], 
+        is_nullable === "YES"
+    )
+).join("\n\t");
 
-const content = `export interface ${interface_name} {
-${table_schema.map(({ column_name, data_type, is_nullable }) => 
-    `\t${column_name}: ${data_type_dictionary[data_type as string]}${is_nullable === "YES" ? " | null" : ""};`
-).join("\n")}
-}`;
+const result: string = wrap_interface(interface_name, interface_lines);
 
-writeFileSync(`./bindings/${file_name}`, content);
+writeFileSync(`./bindings/${file_name}`, result);
 console.log(`\n\n  ${file_name} generated successfully.\n`);
 process.exit(0);
