@@ -1,4 +1,4 @@
-export const data_type_dictionary: { [key: string]: string } = {
+export const data_type_map: { [key: string]: string } = {
 	"bigint"			: "bigint",
 	"bigserial"			: "bigint",
 	"bit"				: "string",

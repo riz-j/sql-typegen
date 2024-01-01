@@ -3663,8 +3663,8 @@ var src_default = Postgres;
 var E2 = __toESM(require_Either(), 1);
 var function2 = __toESM(require_function(), 1);
 
-// src/functions/data-type-dictionary.ts
-var data_type_dictionary = {
+// src/maps/data-type-map.ts
+var data_type_map = {
   bigint: "bigint",
   bigserial: "bigint",
   bit: "string",
@@ -3767,13 +3767,13 @@ var table_schema = await sql`
     WHERE table_name = ${TABLE_NAME}
     ORDER BY ordinal_position;
 `;
-if (table_schema.length < 1) {
+if (!table_schema.length) {
   console.log(`\n\n  ERROR: Table with name '${TABLE_NAME}' is not found\n`);
   process.exit(1);
 }
 var file_name = function2.pipe(TABLE_NAME, singularize) + ".ts";
 var interface_name = function2.pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
-var interface_lines = "\t" + table_schema.map(({ column_name, data_type, is_nullable }) => generate_interface_line(column_name, data_type_dictionary[data_type], is_nullable === "YES")).join("\n\t");
+var interface_lines = "\t" + table_schema.map(({ column_name, data_type, is_nullable }) => generate_interface_line(column_name, data_type_map[data_type], is_nullable === "YES")).join("\n\t");
 var result2 = wrap_interface(interface_name, interface_lines);
 writeFileSync(`./${file_name}`, result2);
 console.log(`\n\n  SUCCESS: ${file_name} has been generated\n`);
