@@ -26,7 +26,7 @@ const table_schema: ColumnSchema[] = await sql`
     ORDER BY ordinal_position;
 `;
 
-if (table_schema.length < 1) {
+if (!table_schema.length) {
     console.log(`\n\n  ERROR: Table with name '${TABLE_NAME}' is not found\n`);
     process.exit(1);
 }
