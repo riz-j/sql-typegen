@@ -15,6 +15,7 @@ export const generate_interface_line = (
     return `${property_name}: ${property_type}${is_nullable ? " | null" : ""};`
 }
 
+
 /**
  * Wraps provided content in a TypeScript interface structure.
  * @param interface_name The name of the interface.
