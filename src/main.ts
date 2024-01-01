@@ -29,8 +29,8 @@ const file_name: string = (pipe(TABLE_NAME, singularize) + ".ts");
 const interface_name: string = pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
 
 const content = `export interface ${interface_name} {
-${table_schema.map(({ column_name, data_type }) => 
-    `\t${column_name}: ${data_type_dictionary[data_type as string]};`
+${table_schema.map(({ column_name, data_type, is_nullable }) => 
+    `\t${column_name}: ${data_type_dictionary[data_type as string]}${is_nullable === "YES" ? " | null" : ""};`
 ).join("\n")}
 }`;
 
