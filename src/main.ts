@@ -26,6 +26,11 @@ const table_schema: ColumnSchema[] = await sql`
     ORDER BY ordinal_position;
 `;
 
+if (table_schema.length < 1) {
+    console.log(`\n\n  ERROR: Table with name '${TABLE_NAME}' is not found\n`);
+    process.exit(1);
+}
+
 const file_name: string = (pipe(TABLE_NAME, singularize) + ".ts");
 const interface_name: string = pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
 const interface_lines: string = "\t" + table_schema.map(({column_name, data_type, is_nullable}) => 
@@ -39,5 +44,5 @@ const interface_lines: string = "\t" + table_schema.map(({column_name, data_type
 const result: string = wrap_interface(interface_name, interface_lines);
 
 writeFileSync(`./${file_name}`, result);
-console.log(`\n\n  ${file_name} generated successfully.\n`);
+console.log(`\n\n  SUCCESS: ${file_name} has been generated\n`);
 process.exit(0);
