@@ -3771,6 +3771,6 @@ var file_name = function2.pipe(TABLE_NAME, singularize) + ".ts";
 var interface_name = function2.pipe(TABLE_NAME, singularize, capitalizeFirstLetter);
 var interface_lines = "\t" + table_schema.map(({ column_name, data_type, is_nullable }) => generate_interface_line(column_name, data_type_dictionary[data_type], is_nullable === "YES")).join("\n\t");
 var result2 = wrap_interface(interface_name, interface_lines);
-writeFileSync(`./bindings/${file_name}`, result2);
+writeFileSync(`./${file_name}`, result2);
 console.log(`\n\n  ${file_name} generated successfully.\n`);
 process.exit(0);
