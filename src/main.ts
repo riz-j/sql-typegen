@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
-import { data_type_map } from "@/maps/data-type-map";
+import { pg_data_type } from "@/maps/pg-data-type";
 import { capitalize_first_letter, get_argv_value, singularize } from "@/functions/common";
 import { PgColumnSchema, PgDbOptions } from "@/models/db";
 import { parse_db_connection_url } from "@/functions/db";
@@ -30,7 +30,7 @@ const interface_name: string = pipe(TABLE_NAME, singularize, capitalize_first_le
 const interface_lines: string = "\t" + table_schema.map(({column_name, data_type, is_nullable}) => 
     generate_interface_line(
         column_name as string, 
-        data_type_map[data_type as string], 
+        pg_data_type[data_type as string], 
         is_nullable === "YES"
     )
 ).join("\n\t");

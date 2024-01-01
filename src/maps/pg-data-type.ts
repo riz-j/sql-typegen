@@ -1,4 +1,4 @@
-export const data_type_map: { [key: string]: string } = {
+export const pg_data_type: { [key: string]: string } = {
 	"bigint"			: "bigint",
 	"bigserial"			: "bigint",
 	"bit"				: "string",
