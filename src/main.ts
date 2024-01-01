@@ -38,6 +38,6 @@ const interface_lines: string = "\t" + table_schema.map(({column_name, data_type
 
 const result: string = wrap_interface(interface_name, interface_lines);
 
-writeFileSync(`./bindings/${file_name}`, result);
+writeFileSync(`./${file_name}`, result);
 console.log(`\n\n  ${file_name} generated successfully.\n`);
 process.exit(0);
