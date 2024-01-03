@@ -5,7 +5,7 @@ import { pg_data_type } from "@/maps/pg-data-type";
 import { capitalize_first_letter, get_argv_value, singularize } from "@/functions/common";
 import { PgColumnSchema, PgDbOptions } from "@/models/db";
 import { parse_db_connection_url } from "@/functions/db";
-import { writeFileSync } from "fs";
+import { writeFileSync, mkdirSync } from "fs";
 import { generate_interface_line, wrap_interface } from "@/functions/interface";
 import { get_postgres_schema } from "./functions/schema";
 
@@ -47,6 +47,8 @@ const interface_lines: string = "\t" + table_schema.map(({column_name, data_type
 
 const result: string = wrap_interface(interface_name, interface_lines);
 
+if (OUTDIR !== ".") { mkdirSync(OUTDIR, { recursive: true }); }
 writeFileSync(`${OUTDIR}/${file_name}`, result);
+
 console.log(`\n\n  SUCCESS: ${file_name} has been generated\n`);
 process.exit(0);
