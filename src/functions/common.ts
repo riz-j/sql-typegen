@@ -11,19 +11,16 @@ import * as E from "fp-ts/lib/Either";
 export const get_argv_value = (argv: string[], tag: string): E.Either<null, string> => {
     const index = argv.indexOf(tag);
 
-    // Early return if the tag is not found or the next item is out of bounds
     if (index === -1 || index + 1 >= argv.length) {
         return E.left(null);
     }
 
     const item: string = argv[index + 1];
 
-    // Early return if the next item is another tag
     if (item.startsWith("--")) {
         return E.left(null);
     }
 
-    // Return the found item
     return E.right(item);
 };
 
@@ -65,7 +62,8 @@ export const singularize = (word: string): string => {
 /**
  * Formats a message string with optional variant prefixes.
  * @param message - The main message text to format.
- * @param variant - "SUCCESS" | "ERROR" | "WARNING" Optional variant type to prefix the message with a specific emoji and variant name.
+ * @param variant - "SUCCESS" | "ERROR" | "WARNING" 
+ * Optional variant type to prefix the message with a specific emoji and variant name.
  * @returns - The formatted message string.
  */
 export const format_message = (
