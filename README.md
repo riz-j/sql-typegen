@@ -18,13 +18,3 @@ export interface Country {
     continent_id: number;
 }
 ```
-
----
-
-List of possible paramters:
-
-| Paramters  | Requirement |
-| :--------- | :---------- |
-| --database | REQUIRED    |
-| --table    | REQUIRED    |
-| --outdir   | OPTIONAL    |
