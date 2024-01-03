@@ -23,6 +23,7 @@ const OUTDIR: string = pipe(get_argv_value(process.argv, "--outdir"), E.fold(
     (result: string) => result
 ));
 
+
 // Generate Database Pool
 const db_options: PgDbOptions = pipe(CONNECTION_STRING, parse_db_connection_url, E.fold(
     (error: Error) => { console.log("ERROR GENERATING DB_OPTIONS", error); process.exit(1); },
@@ -30,11 +31,13 @@ const db_options: PgDbOptions = pipe(CONNECTION_STRING, parse_db_connection_url,
 ));
 const PG_POOL = postgres(db_options);
 
+
 // Fetch schema details for the specified table
 const table_schema: PgColumnSchema[] = pipe(await get_postgres_schema(PG_POOL, TABLE_NAME), E.fold(
     (error: Error) => { console.log("ERROR GENERATING SCHEMA", error.message); process.exit(1); },
     (result: PgColumnSchema[]) => result
 ));
+
 
 // Generate TypeScript interface from the table schema
 const interface_name: string = pipe(TABLE_NAME, singularize, capitalize_first_letter);
@@ -48,10 +51,12 @@ const interface_lines: string = "\t" + table_schema.map(({column_name, data_type
 
 const result: string = wrap_interface(interface_name, interface_lines);
 
+
 // Create output directory (if it doesn't exist) and write the resulting TS interface file
 const file_name: string = (pipe(TABLE_NAME, singularize) + ".ts");
 if (OUTDIR !== ".") { mkdirSync(OUTDIR, { recursive: true }); }
 writeFileSync(`${OUTDIR}/${file_name}`, result);
+
 
 // Notify of successful completion and exit
 console.log(`\n\n  SUCCESS: ${file_name} has been generated\n`);
