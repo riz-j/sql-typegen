@@ -1,3 +1,5 @@
+import * as E from "fp-ts/lib/Either";
+
 /**
  * Retrieves the value following a specific command-line tag.
  * @param argv - Array of command-line arguments.
@@ -6,7 +8,24 @@
  * @example get_argv_value(process.argv, "--database");
  * @example get_argv_value(process.argv, "--table");
  */
-export const get_argv_value = (argv: string[], tag: string): string => argv[argv.indexOf(tag) + 1];
+export const get_argv_value = (argv: string[], tag: string): E.Either<null, string> => {
+    const index = argv.indexOf(tag);
+
+    // Early return if the tag is not found or the next item is out of bounds
+    if (index === -1 || index + 1 >= argv.length) {
+        return E.left(null);
+    }
+
+    const item: string = argv[index + 1];
+
+    // Early return if the next item is another tag
+    if (item.startsWith("--")) {
+        return E.left(null);
+    }
+
+    // Return the found item
+    return E.right(item);
+};
 
 
 /**
