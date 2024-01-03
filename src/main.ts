@@ -10,8 +10,20 @@ import { generate_interface_line, wrap_interface } from "@/functions/interface";
 import { get_postgres_schema } from "./functions/schema";
 
 // Constants for command-line arguments
-const CONNECTION_STRING: string = get_argv_value(process.argv, "--database");
-const TABLE_NAME: string = get_argv_value(process.argv, "--table");
+const CONNECTION_STRING: string = pipe(get_argv_value(process.argv, "--database"), E.fold(
+    () => { console.log("ERROR: the --database tag is not provided"); process.exit(1); },
+    (result: string) => result
+));
+const TABLE_NAME: string = pipe(get_argv_value(process.argv, "--table"), E.fold(
+    () => { console.log("ERROR: the tag --table is not provided"); process.exit(1); },
+    (result: string) => result
+));
+const OUTDIR: string = pipe(get_argv_value(process.argv, "--outdir"), E.fold(
+    () => ".",
+    (result: string) => result
+));
+
+console.log("OUTDIR IS: ", OUTDIR)
 
 const db_options: PgDbOptions = pipe(CONNECTION_STRING, parse_db_connection_url, E.fold(
     (error: Error) => { console.log("ERROR GENERATING DB_OPTIONS", error); process.exit(1); },
@@ -37,6 +49,6 @@ const interface_lines: string = "\t" + table_schema.map(({column_name, data_type
 
 const result: string = wrap_interface(interface_name, interface_lines);
 
-writeFileSync(`./${file_name}`, result);
+writeFileSync(`${OUTDIR}/${file_name}`, result);
 console.log(`\n\n  SUCCESS: ${file_name} has been generated\n`);
 process.exit(0);
