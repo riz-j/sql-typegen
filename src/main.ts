@@ -12,7 +12,7 @@ import { PgColumnSchema, PgDbOptions } from "@/models/db";
 import { parse_db_connection_url } from "@/functions/db";
 import { writeFileSync, mkdirSync } from "fs";
 import { generate_interface_line, wrap_interface } from "@/functions/interface";
-import { get_postgres_schema } from "./functions/schema";
+import { get_postgres_schema } from "@/functions/schema";
 
 // Constants from command-line arguments
 const CONNECTION_STRING: string = pipe(get_argv_value(process.argv, "--database"), E.fold(
