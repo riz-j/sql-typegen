@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getProtoOf = Object.getPrototypeOf;
@@ -3658,7 +3660,7 @@ Object.assign(Postgres, {
 var src_default = Postgres;
 
 // src/main.ts
-var E3 = __toESM(require_Either(), 1);
+var E4 = __toESM(require_Either(), 1);
 var function2 = __toESM(require_function(), 1);
 
 // src/maps/pg-data-type.ts
@@ -3707,7 +3709,18 @@ var pg_data_type = {
 };
 
 // src/functions/common.ts
-var get_argv_value = (argv, tag) => argv[argv.indexOf(tag) + 1];
+var E = __toESM(require_Either(), 1);
+var get_argv_value = (argv, tag) => {
+  const index = argv.indexOf(tag);
+  if (index === -1 || index + 1 >= argv.length) {
+    return E.left(null);
+  }
+  const item = argv[index + 1];
+  if (item.startsWith("--")) {
+    return E.left(null);
+  }
+  return E.right(item);
+};
 var capitalize_first_letter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
@@ -3725,7 +3738,7 @@ var singularize = (word) => {
 };
 
 // src/functions/db.ts
-var E = __toESM(require_Either(), 1);
+var E2 = __toESM(require_Either(), 1);
 var parse_db_connection_url = (db_connection_url) => {
   try {
     const url = new URL(db_connection_url);
@@ -3734,14 +3747,14 @@ var parse_db_connection_url = (db_connection_url) => {
     const database = url.pathname.split("/")[1];
     const username = url.username;
     const password = url.password;
-    return E.right({ host, port, database, username, password });
+    return E2.right({ host, port, database, username, password });
   } catch (error) {
-    return E.left(new Error(JSON.stringify(error)));
+    return E2.left(new Error(JSON.stringify(error)));
   }
 };
 
 // src/main.ts
-import {writeFileSync} from "fs";
+import {writeFileSync, mkdirSync} from "fs";
 
 // src/functions/interface.ts
 var generate_interface_line = (property_name, property_type, is_nullable) => {
@@ -3752,7 +3765,7 @@ var wrap_interface = (interface_name, content_child) => {
 };
 
 // src/functions/schema.ts
-var E2 = __toESM(require_Either(), 1);
+var E3 = __toESM(require_Either(), 1);
 var get_postgres_schema = async (pg_pool, table_name) => {
   try {
     const table_schema = await pg_pool`
@@ -3762,30 +3775,40 @@ var get_postgres_schema = async (pg_pool, table_name) => {
             ORDER BY ordinal_position;
         `;
     if (!table_schema.length) {
-      return E2.left(new Error(`\n\n  ERROR: Table with name '${table_name}' is not found\n`));
+      return E3.left(new Error(`\n\n  ERROR: Table with name '${table_name}' is not found\n`));
     }
-    return E2.right(table_schema);
+    return E3.right(table_schema);
   } catch (error) {
-    return E2.left(new Error(JSON.stringify(error)));
+    return E3.left(new Error(JSON.stringify(error)));
   }
 };
 
 // src/main.ts
-var CONNECTION_STRING = get_argv_value(process.argv, "--database");
-var TABLE_NAME = get_argv_value(process.argv, "--table");
-var db_options = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E3.fold((error) => {
+var CONNECTION_STRING = function2.pipe(get_argv_value(process.argv, "--database"), E4.fold(() => {
+  console.log("ERROR: the --database tag is not provided");
+  process.exit(1);
+}, (result2) => result2));
+var TABLE_NAME = function2.pipe(get_argv_value(process.argv, "--table"), E4.fold(() => {
+  console.log("ERROR: the --table tag is not provided");
+  process.exit(1);
+}, (result2) => result2));
+var OUTDIR = function2.pipe(get_argv_value(process.argv, "--outdir"), E4.fold(() => ".", (result2) => result2));
+var db_options = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E4.fold((error) => {
   console.log("ERROR GENERATING DB_OPTIONS", error);
   process.exit(1);
 }, (result2) => result2));
 var PG_POOL = src_default(db_options);
-var table_schema = function2.pipe(await get_postgres_schema(PG_POOL, TABLE_NAME), E3.fold((error) => {
+var table_schema = function2.pipe(await get_postgres_schema(PG_POOL, TABLE_NAME), E4.fold((error) => {
   console.log("ERROR GENERATING SCHEMA", error.message);
   process.exit(1);
 }, (result2) => result2));
-var file_name = function2.pipe(TABLE_NAME, singularize) + ".ts";
 var interface_name = function2.pipe(TABLE_NAME, singularize, capitalize_first_letter);
 var interface_lines = "\t" + table_schema.map(({ column_name, data_type, is_nullable }) => generate_interface_line(column_name, pg_data_type[data_type], is_nullable === "YES")).join("\n\t");
 var result2 = wrap_interface(interface_name, interface_lines);
-writeFileSync(`./${file_name}`, result2);
+if (OUTDIR !== ".") {
+  mkdirSync(OUTDIR, { recursive: true });
+}
+var file_name = function2.pipe(TABLE_NAME, singularize) + ".ts";
+writeFileSync(`${OUTDIR}/${file_name}`, result2);
 console.log(`\n\n  SUCCESS: ${file_name} has been generated\n`);
 process.exit(0);
