@@ -2,7 +2,12 @@ import postgres from "postgres";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import { pg_data_type } from "@/maps/pg-data-type";
-import { capitalize_first_letter, format_message, get_argv_value, singularize } from "@/functions/common";
+import { 
+    singularize,
+    format_message, 
+    get_argv_value, 
+    capitalize_first_letter
+} from "@/functions/common";
 import { PgColumnSchema, PgDbOptions } from "@/models/db";
 import { parse_db_connection_url } from "@/functions/db";
 import { writeFileSync, mkdirSync } from "fs";
