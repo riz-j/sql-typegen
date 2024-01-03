@@ -23,8 +23,6 @@ const OUTDIR: string = pipe(get_argv_value(process.argv, "--outdir"), E.fold(
     (result: string) => result
 ));
 
-console.log("OUTDIR IS: ", OUTDIR)
-
 const db_options: PgDbOptions = pipe(CONNECTION_STRING, parse_db_connection_url, E.fold(
     (error: Error) => { console.log("ERROR GENERATING DB_OPTIONS", error); process.exit(1); },
     (result: PgDbOptions) => result
