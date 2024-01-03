@@ -15,7 +15,7 @@ export const get_postgres_schema = async (
         `;
 
         if (!table_schema.length) {
-            return E.left(new Error(`\n\n  ERROR: Table with name '${table_name}' is not found\n`))
+            return E.left(new Error(`Table with name '${table_name}' is not found`))
         }
 
         return E.right(table_schema);

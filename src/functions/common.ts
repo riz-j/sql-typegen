@@ -60,3 +60,15 @@ export const singularize = (word: string): string => {
         r => endings[r]
     );
 }
+
+export const format_message = (
+    message: string,
+    variant: 'SUCCESS' | 'ERROR' | 'WARNING' 
+): string => {
+    const emoji_map: { [key: string]: string } = {
+        'SUCCESS': '✨',
+        'ERROR': '🚨',
+        'WARNING': '🚧'
+    }
+    return `\n\n  ${emoji_map[variant]} ${variant}: ${message}\n`
+}

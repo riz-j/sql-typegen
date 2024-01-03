@@ -2,7 +2,7 @@ import postgres from "postgres";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import { pg_data_type } from "@/maps/pg-data-type";
-import { capitalize_first_letter, get_argv_value, singularize } from "@/functions/common";
+import { capitalize_first_letter, format_message, get_argv_value, singularize } from "@/functions/common";
 import { PgColumnSchema, PgDbOptions } from "@/models/db";
 import { parse_db_connection_url } from "@/functions/db";
 import { writeFileSync, mkdirSync } from "fs";
@@ -11,11 +11,11 @@ import { get_postgres_schema } from "./functions/schema";
 
 // Constants from command-line arguments
 const CONNECTION_STRING: string = pipe(get_argv_value(process.argv, "--database"), E.fold(
-    () => { console.log("ERROR: the --database tag is not provided"); process.exit(1); },
+    () => { console.log(format_message("The --database tag is not provided", "ERROR")); process.exit(1); },
     (result: string) => result
 ));
 const TABLE_NAME: string = pipe(get_argv_value(process.argv, "--table"), E.fold(
-    () => { console.log("ERROR: the --table tag is not provided"); process.exit(1); },
+    () => { console.log(format_message("The --table tag is not provided", "ERROR")); process.exit(1); },
     (result: string) => result
 ));
 const OUTDIR: string = pipe(get_argv_value(process.argv, "--outdir"), E.fold(
@@ -26,7 +26,7 @@ const OUTDIR: string = pipe(get_argv_value(process.argv, "--outdir"), E.fold(
 
 // Generate Database Pool
 const db_options: PgDbOptions = pipe(CONNECTION_STRING, parse_db_connection_url, E.fold(
-    (error: Error) => { console.log("ERROR GENERATING DB_OPTIONS", error); process.exit(1); },
+    (error: Error) => { console.log(format_message("ERROR GENERATING DB_OPTIONS" + error, "ERROR")); process.exit(1); },
     (result: PgDbOptions) => result
 ));
 const PG_POOL = postgres(db_options);
@@ -34,7 +34,7 @@ const PG_POOL = postgres(db_options);
 
 // Fetch schema details for the specified table
 const table_schema: PgColumnSchema[] = pipe(await get_postgres_schema(PG_POOL, TABLE_NAME), E.fold(
-    (error: Error) => { console.log("ERROR GENERATING SCHEMA", error.message); process.exit(1); },
+    (error: Error) => { console.log(format_message(error.message, "ERROR")); process.exit(1); },
     (result: PgColumnSchema[]) => result
 ));
 
@@ -59,5 +59,5 @@ writeFileSync(`${OUTDIR}/${file_name}`, result);
 
 
 // Notify of successful completion and exit
-console.log(`\n\n  SUCCESS: ${file_name} has been generated\n`);
+console.log(format_message(`${file_name} has been generated`, "SUCCESS"));
 process.exit(0);
