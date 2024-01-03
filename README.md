@@ -18,3 +18,24 @@ export interface Country {
     continent_id: number;
 }
 ```
+
+<table>
+    <tr>
+        <th colspan="3">Parameters</th>
+    </tr>
+    <tr>
+        <td>--database</td>
+        <td>Database connection string</td>
+        <td>REQUIRED</td>
+    </tr>
+    <tr>
+        <td>--table</td>
+        <td>Name of the SQL table to generate</td>
+        <td>REQUIRED</td>
+    </tr>
+    <tr>
+        <td>--outdir</td>
+        <td>Output directory</td>
+        <td>OPTIONAL</td>
+    </tr>
+</table>
