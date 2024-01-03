@@ -61,14 +61,26 @@ export const singularize = (word: string): string => {
     );
 }
 
+
+/**
+ * Formats a message string with optional variant prefixes.
+ * @param message - The main message text to format.
+ * @param variant - "SUCCESS" | "ERROR" | "WARNING" Optional variant type to prefix the message with a specific emoji and variant name.
+ * @returns - The formatted message string.
+ */
 export const format_message = (
     message: string,
-    variant: 'SUCCESS' | 'ERROR' | 'WARNING' 
+    variant?: 'SUCCESS' | 'ERROR' | 'WARNING' 
 ): string => {
+    if (!variant) {
+        return `\n\n  ${message}\n`;
+    }
+
     const emoji_map: { [key: string]: string } = {
         'SUCCESS': '✨',
         'ERROR': '🚨',
         'WARNING': '🚧'
     }
-    return `\n\n  ${emoji_map[variant]} ${variant}: ${message}\n`
+
+    return `\n\n  ${emoji_map[variant]} ${variant}: ${message}\n`;
 }
