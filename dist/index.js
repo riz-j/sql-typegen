@@ -3736,6 +3736,17 @@ var singularize = (word) => {
   };
   return word.replace(new RegExp(`(${Object.keys(endings).join("|")})\$`), (r) => endings[r]);
 };
+var format_message = (message, variant) => {
+  if (!variant) {
+    return `\n\n  ${message}\n`;
+  }
+  const emoji_map = {
+    SUCCESS: "\u2728",
+    ERROR: "\uD83D\uDEA8",
+    WARNING: "\uD83D\uDEA7"
+  };
+  return `\n\n  ${emoji_map[variant]} ${variant}: ${message}\n`;
+};
 
 // src/functions/db.ts
 var E2 = __toESM(require_Either(), 1);
@@ -3775,7 +3786,7 @@ var get_postgres_schema = async (pg_pool, table_name) => {
             ORDER BY ordinal_position;
         `;
     if (!table_schema.length) {
-      return E3.left(new Error(`\n\n  ERROR: Table with name '${table_name}' is not found\n`));
+      return E3.left(new Error(`Table with name '${table_name}' is not found`));
     }
     return E3.right(table_schema);
   } catch (error) {
@@ -3785,21 +3796,21 @@ var get_postgres_schema = async (pg_pool, table_name) => {
 
 // src/main.ts
 var CONNECTION_STRING = function2.pipe(get_argv_value(process.argv, "--database"), E4.fold(() => {
-  console.log("ERROR: the --database tag is not provided");
+  console.log(format_message("The --database tag is not provided", "ERROR"));
   process.exit(1);
 }, (result2) => result2));
 var TABLE_NAME = function2.pipe(get_argv_value(process.argv, "--table"), E4.fold(() => {
-  console.log("ERROR: the --table tag is not provided");
+  console.log(format_message("The --table tag is not provided", "ERROR"));
   process.exit(1);
 }, (result2) => result2));
 var OUTDIR = function2.pipe(get_argv_value(process.argv, "--outdir"), E4.fold(() => ".", (result2) => result2));
 var db_options = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E4.fold((error) => {
-  console.log("ERROR GENERATING DB_OPTIONS", error);
+  console.log(format_message("ERROR GENERATING DB_OPTIONS" + error, "ERROR"));
   process.exit(1);
 }, (result2) => result2));
 var PG_POOL = src_default(db_options);
 var table_schema = function2.pipe(await get_postgres_schema(PG_POOL, TABLE_NAME), E4.fold((error) => {
-  console.log("ERROR GENERATING SCHEMA", error.message);
+  console.log(format_message(error.message, "ERROR"));
   process.exit(1);
 }, (result2) => result2));
 var interface_name = function2.pipe(TABLE_NAME, singularize, capitalize_first_letter);
@@ -3810,5 +3821,5 @@ if (OUTDIR !== ".") {
 }
 var file_name = function2.pipe(TABLE_NAME, singularize) + ".ts";
 writeFileSync(`${OUTDIR}/${file_name}`, result2);
-console.log(`\n\n  SUCCESS: ${file_name} has been generated\n`);
+console.log(format_message(`${file_name} has been generated`, "SUCCESS"));
 process.exit(0);
