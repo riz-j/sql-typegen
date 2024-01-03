@@ -15,7 +15,7 @@ const CONNECTION_STRING: string = pipe(get_argv_value(process.argv, "--database"
     (result: string) => result
 ));
 const TABLE_NAME: string = pipe(get_argv_value(process.argv, "--table"), E.fold(
-    () => { console.log("ERROR: the tag --table is not provided"); process.exit(1); },
+    () => { console.log("ERROR: the --table tag is not provided"); process.exit(1); },
     (result: string) => result
 ));
 const OUTDIR: string = pipe(get_argv_value(process.argv, "--outdir"), E.fold(
@@ -53,8 +53,8 @@ const result: string = wrap_interface(interface_name, interface_lines);
 
 
 // Create output directory (if it doesn't exist) and write the resulting TS interface file
-const file_name: string = (pipe(TABLE_NAME, singularize) + ".ts");
 if (OUTDIR !== ".") { mkdirSync(OUTDIR, { recursive: true }); }
+const file_name: string = (pipe(TABLE_NAME, singularize) + ".ts");
 writeFileSync(`${OUTDIR}/${file_name}`, result);
 
 
