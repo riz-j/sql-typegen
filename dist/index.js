@@ -3687,7 +3687,7 @@ var pg_data_type = {
   lseg: "string",
   macaddr: "string",
   macaddr8: "string",
-  money: "",
+  money: "string",
   numeric: "number",
   path: "string",
   pg_lsn: "string",
@@ -3699,8 +3699,8 @@ var pg_data_type = {
   smallserial: "number",
   serial: "number",
   text: "string",
-  time: "",
-  timestamp: "",
+  time: "string",
+  timestamp: "Date",
   tsquery: "string",
   tsvector: "string",
   txid_snapshot: "string",
@@ -3753,14 +3753,32 @@ var E2 = __toESM(require_Either(), 1);
 var parse_db_connection_url = (db_connection_url) => {
   try {
     const url = new URL(db_connection_url);
+    if (url.protocol !== "postgresql:") {
+      return E2.left(new Error("Invalid protocol. Only 'postgresql' is currently supported. Make sure you prefix the URL with postgresql://<your-connection-string>."));
+    }
     const host = url.hostname;
+    if (!host) {
+      return E2.left(new Error("Invalid or missing host in the --database connection string."));
+    }
     const port = parseInt(url.port);
+    if (host === "localhost" && url.port && (isNaN(port) || port < 1 || port > 65535)) {
+      return E2.left(new Error("Invalid or missing port in the --database connection string."));
+    }
     const database = url.pathname.split("/")[1];
+    if (!database) {
+      return E2.left(new Error("Invalid or missing database name in the --database connection string."));
+    }
     const username = url.username;
+    if (!username) {
+      return E2.left(new Error("Invalid or missing username in the --database connection string."));
+    }
     const password = url.password;
+    if (!password) {
+      return E2.left(new Error("Invalid or missing password in the --database connection string."));
+    }
     return E2.right({ host, port, database, username, password });
   } catch (error) {
-    return E2.left(new Error(JSON.stringify(error)));
+    return E2.left(new Error(`Error parsing database connection URL: ${error}`));
   }
 };
 
@@ -3805,7 +3823,7 @@ var TABLE_NAME = function2.pipe(get_argv_value(process.argv, "--table"), E4.fold
 }, (result2) => result2));
 var OUTDIR = function2.pipe(get_argv_value(process.argv, "--outdir"), E4.fold(() => ".", (result2) => result2));
 var db_options = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E4.fold((error) => {
-  console.log(format_message("ERROR GENERATING DB_OPTIONS" + error, "ERROR"));
+  console.log(format_message("FAILED GENERATING DB_OPTIONS\n\n" + error.message, "ERROR"));
   process.exit(1);
 }, (result2) => result2));
 var PG_POOL = src_default(db_options);
