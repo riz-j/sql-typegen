@@ -3724,6 +3724,12 @@ var get_argv_value = (argv, tag) => {
 var capitalize_first_letter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
+var snake_case_to_kebab_case = (string) => {
+  return string.replace(/_/g, "-");
+};
+var snake_case_to_camel_case = (string) => {
+  return string.replace(/(_[a-z])/g, (match) => match[1].toUpperCase());
+};
 var singularize = (word) => {
   const endings = {
     ves: "fe",
@@ -3831,13 +3837,13 @@ var table_schema = function2.pipe(await get_postgres_schema(PG_POOL, TABLE_NAME)
   console.log(format_message(error.message, "ERROR"));
   process.exit(1);
 }, (result2) => result2));
-var interface_name = function2.pipe(TABLE_NAME, singularize, capitalize_first_letter);
+var interface_name = function2.pipe(TABLE_NAME, singularize, snake_case_to_camel_case, capitalize_first_letter);
 var interface_lines = "\t" + table_schema.map(({ column_name, data_type, is_nullable }) => generate_interface_line(column_name, pg_data_type[data_type.split(" ")[0]], is_nullable === "YES")).join("\n\t");
 var result2 = wrap_interface(interface_name, interface_lines);
 if (OUTDIR !== ".") {
   mkdirSync(OUTDIR, { recursive: true });
 }
-var file_name = function2.pipe(TABLE_NAME, singularize) + ".ts";
+var file_name = function2.pipe(TABLE_NAME, singularize, snake_case_to_kebab_case) + ".ts";
 writeFileSync(`${OUTDIR}/${file_name}`, result2);
 console.log(format_message(`${file_name} has been generated`, "SUCCESS"));
 process.exit(0);
