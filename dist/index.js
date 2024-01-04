@@ -3832,7 +3832,7 @@ var table_schema = function2.pipe(await get_postgres_schema(PG_POOL, TABLE_NAME)
   process.exit(1);
 }, (result2) => result2));
 var interface_name = function2.pipe(TABLE_NAME, singularize, capitalize_first_letter);
-var interface_lines = "\t" + table_schema.map(({ column_name, data_type, is_nullable }) => generate_interface_line(column_name, pg_data_type[data_type], is_nullable === "YES")).join("\n\t");
+var interface_lines = "\t" + table_schema.map(({ column_name, data_type, is_nullable }) => generate_interface_line(column_name, pg_data_type[data_type.split(" ")[0]], is_nullable === "YES")).join("\n\t");
 var result2 = wrap_interface(interface_name, interface_lines);
 if (OUTDIR !== ".") {
   mkdirSync(OUTDIR, { recursive: true });
