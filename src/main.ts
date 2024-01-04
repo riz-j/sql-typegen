@@ -7,7 +7,8 @@ import {
     format_message, 
     get_argv_value, 
     capitalize_first_letter,
-    snake_case_to_kebab_case
+    snake_case_to_kebab_case,
+    snake_case_to_camel_case
 } from "@/functions/common";
 import { PgColumnSchema, PgDbOptions } from "@/models/db";
 import { parse_db_connection_url } from "@/functions/db";
@@ -46,7 +47,12 @@ const table_schema: PgColumnSchema[] = pipe(await get_postgres_schema(PG_POOL, T
 
 
 // Generate TypeScript interface from the table schema
-const interface_name: string = pipe(TABLE_NAME, singularize, capitalize_first_letter);
+const interface_name: string = pipe(
+    TABLE_NAME,
+    singularize,
+    snake_case_to_camel_case,
+    capitalize_first_letter
+);
 const interface_lines: string = "\t" + table_schema.map(({column_name, data_type, is_nullable}) => 
     generate_interface_line(
         column_name as string, 
