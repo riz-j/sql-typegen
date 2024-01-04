@@ -6,7 +6,8 @@ import {
     singularize,
     format_message, 
     get_argv_value, 
-    capitalize_first_letter
+    capitalize_first_letter,
+    snake_case_to_kebab_case
 } from "@/functions/common";
 import { PgColumnSchema, PgDbOptions } from "@/models/db";
 import { parse_db_connection_url } from "@/functions/db";
@@ -59,7 +60,7 @@ const result: string = wrap_interface(interface_name, interface_lines);
 
 // Create output directory (if it doesn't exist) and write the resulting TS interface file
 if (OUTDIR !== ".") { mkdirSync(OUTDIR, { recursive: true }); }
-const file_name: string = (pipe(TABLE_NAME, singularize) + ".ts");
+const file_name: string = (pipe(TABLE_NAME, singularize, snake_case_to_kebab_case) + ".ts");
 writeFileSync(`${OUTDIR}/${file_name}`, result);
 
 
