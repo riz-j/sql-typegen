@@ -31,7 +31,7 @@ const OUTDIR: string = pipe(get_argv_value(process.argv, "--outdir"), E.fold(
 
 // Generate Database Pool
 const db_options: PgDbOptions = pipe(CONNECTION_STRING, parse_db_connection_url, E.fold(
-    (error: Error) => { console.log(format_message("ERROR GENERATING DB_OPTIONS" + error, "ERROR")); process.exit(1); },
+    (error: Error) => { console.log(format_message("FAILED GENERATING DB_OPTIONS\n\n" + error.message, "ERROR")); process.exit(1); },
     (result: PgDbOptions) => result
 ));
 const PG_POOL = postgres(db_options);

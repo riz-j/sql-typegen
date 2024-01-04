@@ -4,6 +4,10 @@ import * as E from "fp-ts/Either";
 export const parse_db_connection_url = (db_connection_url: string): E.Either<Error, PgDbOptions>  => {
     try {
         const url = new URL(db_connection_url);
+        
+        if (url.protocol !== "postgresql:") {
+            return E.left(new Error("Only 'postgresql' is currently supported.\n\nMake sure you prefix the URL with postgresql://<your-connection-string>. Support for other databases coming soon."))
+        }        
 
         const host = url.hostname;
         const port = parseInt(url.port);
