@@ -49,7 +49,7 @@ const interface_name: string = pipe(TABLE_NAME, singularize, capitalize_first_le
 const interface_lines: string = "\t" + table_schema.map(({column_name, data_type, is_nullable}) => 
     generate_interface_line(
         column_name as string, 
-        pg_data_type[data_type as string], 
+        pg_data_type[data_type.split(" ")[0] as string],
         is_nullable === "YES"
     )
 ).join("\n\t");
