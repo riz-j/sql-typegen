@@ -36,11 +36,11 @@ const db_options: PgDbOptions = pipe(CONNECTION_STRING, parse_db_connection_url,
     (error: Error) => { console.log(format_message("FAILED GENERATING DB_OPTIONS\n\n" + error.message, "ERROR")); process.exit(1); },
     (result: PgDbOptions) => result
 ));
-const PG_POOL = postgres(db_options);
+const pg_pool = postgres(db_options);
 
 
 // Fetch schema details for the specified table
-const table_schema: PgColumnSchema[] = pipe(await get_postgres_schema(PG_POOL, TABLE_NAME), E.fold(
+const table_schema: PgColumnSchema[] = pipe(await get_postgres_schema(pg_pool, TABLE_NAME), E.fold(
     (error: Error) => { console.log(format_message(error.message, "ERROR")); process.exit(1); },
     (result: PgColumnSchema[]) => result
 ));
