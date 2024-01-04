@@ -36,6 +36,26 @@ export const capitalize_first_letter = (string: string): string => {
 
 
 /**
+ * Converts a string from snake_case to kebab-case.
+ * @param string - The string to convert from snake_case to kebab-case.
+ * @returns - The input string converted to kebab-case.
+ */
+export const snake_case_to_kebab_case = (string: string): string => {
+    return string.replace(/_/g, '-');
+}
+
+
+/**
+ * Converts a string from snake_case to camelCase.
+ * @param string - The string to convert from snake_case to camelCase.
+ * @returns - The input string converted to camelCase.
+ */
+export const snake_case_to_camel_case = (string: string): string => {
+    return string.replace(/(_[a-z])/g, (match) => match[1].toUpperCase());
+}
+
+
+/**
  * Converts a plural word to its singular form based on common English language rules.
  * It matches the word against known plural endings and replaces with the corresponding singular ending.
  * @param word - The plural word to be singularized.
