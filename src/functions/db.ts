@@ -1,7 +1,7 @@
 import { PgDbOptions } from "@/models/db";
 import * as E from "fp-ts/Either";
 
-const ACCEPTED_PROTOCOLS: string[] = ["postgresql:", "postgres:"];
+const ACCEPTED_PROTOCOLS: ReadonlyArray<string> = ["postgresql:", "postgres:"];
 
 /**
  * Parses the given database connection URL and returns PostgreSQL database options.
