@@ -1,6 +1,8 @@
 import { PgDbOptions } from "@/models/db";
 import * as E from "fp-ts/Either";
 
+const ACCEPTED_PROTOCOLS: string[] = ["postgresql:", "postgres:"];
+
 /**
  * Parses the given database connection URL and returns PostgreSQL database options.
  * @param db_connection_url - The full database connection URL as a string.
@@ -10,7 +12,7 @@ export const parse_db_connection_url = (db_connection_url: string): E.Either<Err
     try {
         const url = new URL(db_connection_url);
 
-        if (url.protocol !== "postgresql:") {
+        if (!ACCEPTED_PROTOCOLS.includes(url.protocol)) {
             return E.left(new Error("Invalid protocol. Only 'postgresql' is currently supported. Make sure you prefix the URL with postgresql://<your-connection-string>."));
         }
 
