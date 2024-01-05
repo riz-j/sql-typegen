@@ -17,15 +17,15 @@ import { generate_interface_line, wrap_interface } from "@/functions/interface";
 import { get_postgres_schema } from "@/functions/schema";
 
 // Constants from command-line arguments
-const CONNECTION_STRING: string = pipe(get_argv_value(process.argv, "--database"), E.fold(
+const CONNECTION_STRING: Readonly<string> = pipe(get_argv_value(process.argv, "--database"), E.fold(
     () => { console.log(format_message("The --database tag is not provided", "ERROR")); process.exit(1); },
     (result: string) => result
 ));
-const TABLE_NAME: string = pipe(get_argv_value(process.argv, "--table"), E.fold(
+const TABLE_NAME: Readonly<string> = pipe(get_argv_value(process.argv, "--table"), E.fold(
     () => { console.log(format_message("The --table tag is not provided", "ERROR")); process.exit(1); },
     (result: string) => result
 ));
-const OUTDIR: string = pipe(get_argv_value(process.argv, "--outdir"), E.fold(
+const OUTDIR: Readonly<string> = pipe(get_argv_value(process.argv, "--outdir"), E.fold(
     () => ".",
     (result: string) => result
 ));
