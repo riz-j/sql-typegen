@@ -3756,10 +3756,11 @@ var format_message = (message, variant) => {
 
 // src/functions/db.ts
 var E2 = __toESM(require_Either(), 1);
+var ACCEPTED_PROTOCOLS = ["postgresql:", "postgres:"];
 var parse_db_connection_url = (db_connection_url) => {
   try {
     const url = new URL(db_connection_url);
-    if (url.protocol !== "postgresql:") {
+    if (!ACCEPTED_PROTOCOLS.includes(url.protocol)) {
       return E2.left(new Error("Invalid protocol. Only 'postgresql' is currently supported. Make sure you prefix the URL with postgresql://<your-connection-string>."));
     }
     const host = url.hostname;
@@ -3832,8 +3833,8 @@ var db_options = function2.pipe(CONNECTION_STRING, parse_db_connection_url, E4.f
   console.log(format_message("FAILED GENERATING DB_OPTIONS\n\n" + error.message, "ERROR"));
   process.exit(1);
 }, (result2) => result2));
-var PG_POOL = src_default(db_options);
-var table_schema = function2.pipe(await get_postgres_schema(PG_POOL, TABLE_NAME), E4.fold((error) => {
+var pg_pool = src_default(db_options);
+var table_schema = function2.pipe(await get_postgres_schema(pg_pool, TABLE_NAME), E4.fold((error) => {
   console.log(format_message(error.message, "ERROR"));
   process.exit(1);
 }, (result2) => result2));
